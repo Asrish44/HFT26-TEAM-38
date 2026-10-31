@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -67,6 +67,7 @@ interface AdminData {
 }
 
 function AdminContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const tokenFromUrl = searchParams.get("token") || "";
 
@@ -145,7 +146,6 @@ function AdminContent() {
 
   useEffect(() => {
     if (tokenFromUrl) {
-      setToken(tokenFromUrl);
       void loadAdminData(tokenFromUrl);
     } else {
       setLoading(false);
@@ -349,7 +349,7 @@ function AdminContent() {
               {copiedLink ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
               {copiedLink ? "Link Copied!" : "Copy Admin Link"}
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => (window.location.href = "/")} className="gap-1 text-xs text-slate-400">
+            <Button size="sm" variant="ghost" onClick={() => router.push("/")} className="gap-1 text-xs text-slate-400">
               <ArrowLeft className="h-3.5 w-3.5" /> Back to App
             </Button>
           </div>

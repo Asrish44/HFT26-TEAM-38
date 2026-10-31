@@ -51,20 +51,15 @@ export function SynthesisMatrixModal({ isOpen, onClose, papers }: Props) {
   const [copiedQuote, setCopiedQuote] = useState<string | null>(null);
   const [selectedClaim, setSelectedClaim] = useState<GroundedAssertion | null>(null);
 
-  // Sync selections when papers change
-  useEffect(() => {
-    if (!paperAId && papers[0]) setPaperAId(papers[0].id);
-    if (!paperBId && papers[1]) setPaperBId(papers[1].id);
-  }, [papers, paperAId, paperBId]);
-
-  if (!isOpen) return null;
+  const effectivePaperAId = paperAId || papers[0]?.id || "";
+  const effectivePaperBId = paperBId || papers[1]?.id || "";
 
   const handleRunSynthesis = async () => {
-    if (!paperAId || !paperBId) {
+    if (!effectivePaperAId || !effectivePaperBId) {
       toast({ title: "Select two papers", description: "Multi-paper comparison requires two documents.", variant: "destructive" });
       return;
     }
-    if (paperAId === paperBId) {
+    if (!effectivePaperAId || effectivePaperAId === effectivePaperBId) {
       toast({ title: "Select distinct papers", description: "Choose two different papers for cross-paper synthesis.", variant: "destructive" });
       return;
     }
@@ -76,8 +71,8 @@ export function SynthesisMatrixModal({ isOpen, onClose, papers }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "synthesize",
-          paperAId,
-          paperBId,
+          paperAId: effectivePaperAId,
+          paperBId: effectivePaperBId,
         }),
       });
 
@@ -106,6 +101,9 @@ export function SynthesisMatrixModal({ isOpen, onClose, papers }: Props) {
     toast({ title: "Copied to clipboard" });
     setTimeout(() => setCopiedQuote(null), 2000);
   };
+
+  if (!isOpen) return null;
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
@@ -142,7 +140,7 @@ export function SynthesisMatrixModal({ isOpen, onClose, papers }: Props) {
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold text-slate-300">Paper A:</span>
               <select
-                value={paperAId}
+                value={effectivePaperAId}
                 onChange={(e) => setPaperAId(e.target.value)}
                 className="h-8 max-w-[200px] truncate rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               >
@@ -159,7 +157,7 @@ export function SynthesisMatrixModal({ isOpen, onClose, papers }: Props) {
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-semibold text-slate-300">Paper B:</span>
               <select
-                value={paperBId}
+                value={effectivePaperBId}
                 onChange={(e) => setPaperBId(e.target.value)}
                 className="h-8 max-w-[200px] truncate rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500"
               >

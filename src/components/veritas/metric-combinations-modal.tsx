@@ -51,8 +51,6 @@ export function MetricCombinationsModal({
   const [penalizeDowngrades, setPenalizeDowngrades] = useState<boolean>(true);
   const [includeUnresolvedAsFN, setIncludeUnresolvedAsFN] = useState<boolean>(true);
 
-  if (!isOpen) return null;
-
   const activeCombo = combinations?.[selectedId] || combinations?.strict_gate;
 
   // Calculate dynamic 5-dimension custom composite based on toggles
@@ -134,6 +132,7 @@ export function MetricCombinationsModal({
       ? customDimComposite.f1
       : activeCombo?.f1 ?? 93.7;
 
+  if (!isOpen) return null;
   return (
     <div
       role="dialog"
